@@ -23,7 +23,7 @@ jobs:
             $advinst = New-Object -ComObject 'AdvancedInstaller'
             $project = $advinst.LoadProject($aipPath)
 
-            $project.ProductDetails.Version = '1.2.0'
+            $project.ProductDetails.Version = '2.0.0'
             # further project edits go here
 
             Write-Host $project.Build()
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: setup
-          path: ${{ github.workspace }}\setup\setup2.msi
+          path: ${{ github.workspace }}\setup\setup.msi
