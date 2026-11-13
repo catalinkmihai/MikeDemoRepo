@@ -26,6 +26,11 @@ jobs:
             $project.ProductDetails.Version = '2.0.0'
             # further project edits go here
 
+             # Pick the build and set its output folder and MSI file name
+            $build = $project.BuildComponent.Builds | Where-Object { $_.Name -eq 'DefaultBuild' }
+            $build.OutputFolder = Join-Path $env:GITHUB_WORKSPACE 'setup'
+            $build.PackageName  = 'setup.msi'   # use 'setup2.msi' or whatever name you want
+
             Write-Host $project.Build()
             $project.Build()
           }
