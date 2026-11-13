@@ -27,6 +27,7 @@ jobs:
             # further project edits go here
 
             Write-Host $project.Build()
+            $project.Build()
           }
           catch {
             Write-Error $_
