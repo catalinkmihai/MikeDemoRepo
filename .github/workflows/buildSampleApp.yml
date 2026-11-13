@@ -1,27 +1,43 @@
-name: Build Advanced Installer Project (.AIP)  Demo
+name: Build Advanced Installer Project (.AIP) with PowerShell automation
 on: [workflow_dispatch]
 jobs:
-  advinst-aip-build-demo:
+  advinst-powershell-build:
     runs-on: windows-latest
-    name: Build Aip Demo
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Build AIP
+        uses: actions/checkout@v4
+
+      # Deploy only: no aip-* inputs, so nothing is built here
+      - name: Deploy Advanced Installer
         uses: caphyon/advinst-github-action@main
         with:
           advinst-version: '24.1'
           advinst-license: ${{ secrets.ADVINST_LICENSE_KEY }}
           advinst-enable-automation: 'true'
-          aip-path: ${{ github.workspace }}\My demo app.aip
-          aip-build-name: DefaultBuild
-          aip-package-name: setup.msi
-          aip-output-dir:  ${{ github.workspace }}\setup
-          aip-commands: |
-            SetProperty FOO="foo"
-            SetVersion 1.2.0
+
+      - name: Build with PowerShell automation
+        shell: pwsh
+        run: |
+          try {
+            $aipPath = Join-Path $env:GITHUB_WORKSPACE 'My demo app.aip'
+            $advinst = New-Object -ComObject 'AdvancedInstaller'
+            $project = $advinst.LoadProject($aipPath)
+
+            $project.ProductDetails.Version = '1.2.0'
+            # further project edits go here
+
+            Write-Host $project.Build()
+          }
+          catch {
+            Write-Error $_
+            exit 1
+          }
+          finally {
+            if ($advinst) { $advinst.Exit() }
+          }
+
       - name: Publish setup artifact
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4
         with:
           name: setup
           path: ${{ github.workspace }}\setup\setup.msi
