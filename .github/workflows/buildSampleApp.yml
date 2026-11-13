@@ -30,8 +30,7 @@ jobs:
             $build = $project.BuildComponent.Builds | Where-Object { $_.Name -eq 'DefaultBuild' }
             $build.OutputFolder = Join-Path $env:GITHUB_WORKSPACE 'setup'
             $build.PackageName  = 'setup.msi'   # use 'setup2.msi' or whatever name you want
-
-            Write-Host $project.Build()
+            $project.Save()
             $project.Build()
           }
           catch {
